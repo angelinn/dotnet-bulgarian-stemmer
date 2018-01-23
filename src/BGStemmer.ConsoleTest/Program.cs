@@ -11,9 +11,10 @@ namespace BGStemmer.ConsoleTest
         public static void Main(string[] args)
         {
             BulgarianStemmer stemmer = new BulgarianStemmer();
-            stemmer.LoadRules("../../stem_rules_context_3.txt");
+            stemmer.LoadRules("../../stem_rules_context_1.txt");
 
-            Console.WriteLine(stemmer.Stem("каране"));
+            Console.WriteLine(stemmer.Stem("обикновен"));
+            Console.WriteLine(stemmer.Stem("английски"));
         }
     }
 }
