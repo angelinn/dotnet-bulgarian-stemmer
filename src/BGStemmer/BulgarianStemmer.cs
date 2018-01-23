@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BGStemmer.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -22,6 +23,8 @@ namespace BGStemmer
             if (!File.Exists(fileName))
                 return false;
 
+            stemmingRules.Clear();
+
             string[] fileContents = File.ReadAllLines(fileName, Encoding.Default);
             foreach (string line in fileContents)
             {
@@ -39,6 +42,9 @@ namespace BGStemmer
 
         public string Stem(string word)
         {
+            if (stemmingRules.Count == 0)
+                throw new RulesException("Rules dictionary is empty.");
+
             if (!VOCALS_REGEX.IsMatch(word))
                 return word;
 
