@@ -11,10 +11,10 @@ namespace BGStemmer
 
         private Dictionary<string, string> stemmingRules = new Dictionary<string, string>();
 
-        public const int STEM_BOUNDARY = 1;
+        private const int STEM_BOUNDARY = 1;
 
-        private static readonly Regex VOCALS_REGEX = new Regex("[^\xe0\xfa\xee\xf3\xe5\xe8\xff\xfe]*[\xe0\xfa\xee\xf3\xe5\xe8\xff\xfe]");
-        private static readonly Regex RULE_REGEX = new Regex("([\xe0-\xff]+)\\s==>\\s([\xe0-\xff]+)\\s([0-9]+)");
+        private static readonly Regex VOCALS_REGEX = new Regex("[^аъоуеияю]*[аъоуеияю]");
+        private static readonly Regex RULE_REGEX = new Regex("([а-я]+)\\s==>\\s([а-я]+)\\s([0-9]+)");
 
 
         public bool LoadRules(string fileName)
@@ -22,24 +22,35 @@ namespace BGStemmer
             if (!File.Exists(fileName))
                 return false;
 
-            string[] fileContents = File.ReadAllLines(fileName);
+            string[] fileContents = File.ReadAllLines(fileName, Encoding.Default);
             foreach (string line in fileContents)
             {
-                MatchCollection matches = RULE_REGEX.Matches(line);
-                if (matches.Count == 3)
+                Match match = RULE_REGEX.Match(line);
+                if (match.Groups.Count == 4)
                 {
-                    if (Int32.Parse(matches[3].Value) > STEM_BOUNDARY)
-                        stemmingRules.Add(matches[1].Value, matches[2].Value);
+                    if (Int32.Parse(match.Groups[3].Value) > STEM_BOUNDARY)
+                        stemmingRules.Add(match.Groups[1].Value, match.Groups[2].Value);
 
                 }
             }
-
+            
             return true;
         }
 
-        public void Stem(string word)
+        public string Stem(string word)
         {
+            if (!VOCALS_REGEX.IsMatch(word))
+                return word;
 
+            for (int i = 0; i < word.Length; ++i)
+            {
+                string suffix = word.Substring(i);
+
+                if (stemmingRules.ContainsKey(suffix))
+                    return $"{word.Substring(0, i)}{stemmingRules[suffix]}";
+            }
+
+            return word;
         }
     }
 }
