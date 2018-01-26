@@ -17,15 +17,22 @@ namespace BGStemmer
         private static readonly Regex VOCALS_REGEX = new Regex("[^аъоуеияю]*[аъоуеияю]");
         private static readonly Regex RULE_REGEX = new Regex("([а-я]+)\\s==>\\s([а-я]+)\\s([0-9]+)");
 
+        private const string DEFAULT_RULE_FILE = "stem_rules_context_1.txt";
 
-        public bool LoadRules(string fileName)
+        public BulgarianStemmer(string fileName = null)
         {
+            LoadRules(fileName);
+        }
+
+        public bool LoadRules(string fileName = null)
+        {
+            fileName = fileName ?? DEFAULT_RULE_FILE;
             if (!File.Exists(fileName))
                 return false;
 
             stemmingRules.Clear();
 
-            string[] fileContents = File.ReadAllLines(fileName, Encoding.Default);
+            string[] fileContents = File.ReadAllLines(fileName, Encoding.GetEncoding(0));
             foreach (string line in fileContents)
             {
                 Match match = RULE_REGEX.Match(line);
